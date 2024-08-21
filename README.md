@@ -4,7 +4,7 @@ This tool benchmarks the performance of various Large Language Models (LLMs) acr
 
 ## Features
 
-- Supports multiple LLM providers (Octo, Groq, Fireworks, Cerebras, Together)
+- Supports multiple LLM providers (Octo, Groq, Fireworks, Together)
 - Measures real-time performance, prompt tokens per second, and completion tokens per second
 - Configurable number of runs and custom prompts
 - Uses Weave for evaluation and scoring
