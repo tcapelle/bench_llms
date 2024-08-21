@@ -93,7 +93,7 @@ Remember to ensure that the new provider's API is compatible with the OpenAI cli
 
 You can visualize the results with Weights & Biases [Weave](https://wandb.github.io/weave/):
 
-![](./compare.png)
+[![](./compare.png)](https://wandb.ai/capecape/benchmark_llama_70b/weave/compare-evaluations?evaluationCallIds=%5B%220191753f-5423-7003-b885-2a50dceb993b%22%2C%220191753e-cab1-75d3-8282-94dc5628d3a9%22%2C%220191753e-283e-7033-b0ac-86e646195f1e%22%2C%220191753d-640c-7053-86bd-72eb54949d07%22%5D)
 
 ## Contributing
 
