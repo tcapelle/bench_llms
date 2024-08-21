@@ -1,4 +1,5 @@
 # LLM Benchmark Tool
+![](./compare.png)
 
 This tool benchmarks the performance of various Large Language Models (LLMs) across different providers.
 
