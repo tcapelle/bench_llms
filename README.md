@@ -27,6 +27,7 @@ This tool benchmarks the performance of various Large Language Models (LLMs) acr
    export OCTO_API_KEY=your_octo_api_key
    export GROQ_API_KEY=your_groq_api_key
    export FIREWORKS_API_KEY=your_fireworks_api_key
+   export CEREBRAS_API_KEY=your_cerebras_api_key
    export TOGETHER_API_KEY=your_together_api_key
    ```
 
@@ -38,22 +39,59 @@ Run the benchmark with default settings:
 python benchmark.py
 ```
 
-You can also customize the benchmark settings by providing command-line arguments:
+Customize the benchmark:
 
 ```
-python benchmark.py --provider <provider_name> --prompt <custom_prompt> --n <num_runs>
+python benchmark.py --provider fireworks --prompt "Explain quantum computing" --n 5
 ```
 
-For example the default settings are (around 1k tokens for llama70b)
+## Project Structure
 
-```
-python benchmark.py --provider fireworks --prompt "Tell me a long story about a cat" --n 10
-```
+- `benchmark.py`: Main script for running the benchmark
+- `providers.py`: Definitions of LLM providers
+- `requirements.txt`: List of Python dependencies
+- `README.md`: This file
 
-This will run the benchmark with the Fireworks provider, using the prompt "Tell me a joke", and perform 5 runs.
+## Adding a New Provider
 
-## Visualizing Results
+To add a new LLM provider to the benchmark tool, follow these steps:
 
-You can visualize the results in Weave:
+1. Open the `providers.py` file.
 
-![](./compare.png)
+2. Add a new entry to the `PROVIDERS` dictionary with the following format:
+
+   ```python
+   "provider_name": Provider(
+       client=openai.OpenAI(
+           base_url="https://api.provider.com/v1",
+           api_key=os.environ.get("PROVIDER_API_KEY")
+       ),
+       model="provider-model-name"
+   )
+   ```
+
+   Replace `provider_name`, `https://api.provider.com/v1`, `PROVIDER_API_KEY`, and `provider-model-name` with the appropriate values for the new provider.
+
+3. Add the new provider's API key to your environment variables:
+
+   ```
+   export PROVIDER_API_KEY=your_provider_api_key
+   ```
+
+4. Update the README to include the new provider in the list of supported providers and add the new environment variable to the setup instructions.
+
+5. Test the new provider by running the benchmark with the new provider name:
+
+   ```
+   python benchmark.py --provider provider_name
+   ```
+
+Remember to ensure that the new provider's API is compatible with the OpenAI client format used in this tool. If it's not, you may need to modify the `call_llama` function in `benchmark.py` to handle any differences in the API structure.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License.
