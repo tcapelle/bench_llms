@@ -14,6 +14,7 @@ def call_llama(client, model="llama3.1-70b", prompt=None):
     start_time = time.perf_counter()
     response = client.chat.completions.create(
         model=model,
+        max_tokens=2048,
         temperature=random.random(),
         messages=[
             {"role": "user", "content": prompt},
@@ -52,12 +53,27 @@ def evaluate_model_perf(client, model, prompt, num_runs=10):
         perf_results["prompt_tok_sec"] += output["prompt_tok_sec"]
         perf_results["completion_tok_sec"] += output["completion_tok_sec"]
 
-def speed_score(model_output):
+def metrics(model_output):
     return {
         "real_time": model_output["real_time"],
         "prompt_tok_sec": model_output["prompt_tok_sec"],
         "completion_tok_sec": model_output["completion_tok_sec"],
     }
+
+
+def main(config):
+    provider = PROVIDERS[config.provider]
+    weave.init(config.weave_project)
+
+    class Llama70b(weave.Model):
+        @weave.op
+        def predict(self, prompt):
+            return call_llama(provider.client, provider.model, prompt)
+
+    llama = Llama70b()
+    evaluation = weave.Evaluation(dataset=[{"prompt": config.prompt} for _ in range(config.n)], scorers=[metrics])
+
+    asyncio.run(evaluation.evaluate(llama))
 
 @dataclass
 class BenchmarkConfig:
@@ -67,21 +83,10 @@ class BenchmarkConfig:
     weave_project: str = "benchmark_llama_70b" # "prompt-eng/benchmark_llama_70b"
 
 
+
 if __name__ == "__main__":
     config = simple_parsing.parse(BenchmarkConfig)
     print(f"Running benchmark with config: {config}")
-    provider = PROVIDERS[config.provider]
-    weave.init(args.weave_project)
+    main(config)
 
-    class Llama70b(weave.Model):
-        @weave.op
-        def predict(self, prompt):
-            return call_llama(provider.client, provider.model, prompt)
 
-    llama = Llama70b()
-    # raw_out = llama.predict(config.prompt)
-    # print(raw_out)
-
-    evaluation = weave.Evaluation(dataset=[{"prompt": config.prompt} for _ in range(config.n)], scorers=[speed_score])
-
-    asyncio.run(evaluation.evaluate(llama))
