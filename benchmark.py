@@ -29,7 +29,7 @@ def call_llama(client, model="llama3.1-70b", prompt=None):
         completion_tok_sec = response.usage.completion_tokens / time_info["completion_time"]
     else:
         # If time_info is not available, use real_time for both prompt and completion
-        prompt_tok_sec = -1
+        prompt_tok_sec = None
         completion_tok_sec = response.usage.completion_tokens / real_time
 
     return {
