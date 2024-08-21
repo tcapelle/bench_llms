@@ -88,6 +88,12 @@ To add a new LLM provider to the benchmark tool, follow these steps:
 
 Remember to ensure that the new provider's API is compatible with the OpenAI client format used in this tool. If it's not, you may need to modify the `call_llama` function in `benchmark.py` to handle any differences in the API structure.
 
+## Visualizing Results
+
+You can visualize the results with Weights & Biases [Weave](https://wandb.github.io/weave/):
+
+![](./compare.png)
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
