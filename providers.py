@@ -35,5 +35,12 @@ PROVIDERS = {
             base_url="https://api.together.xyz/v1",
         ),
         model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo"
+    ),
+    "vllm_8xh100": Provider(
+        client=openai.OpenAI(
+            api_key="EMPTY",
+            base_url="http://195.242.16.86:8000/v1",
+        ),
+        model="meta-llama/Meta-Llama-3.1-70B-Instruct"
     )
 }
