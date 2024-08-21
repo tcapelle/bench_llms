@@ -44,10 +44,16 @@ You can also customize the benchmark settings by providing command-line argument
 python benchmark.py --provider <provider_name> --prompt <custom_prompt> --n <num_runs>
 ```
 
-For example:
+For example the default settings are (around 1k tokens for llama70b)
 
 ```
-python benchmark.py --provider fireworks --prompt "Tell me a joke" --n 5
+python benchmark.py --provider fireworks --prompt "Tell me a long story about a cat" --n 10
 ```
 
 This will run the benchmark with the Fireworks provider, using the prompt "Tell me a joke", and perform 5 runs.
+
+## Visualizing Results
+
+You can visualize the results in Weave:
+
+![](./compare.png)

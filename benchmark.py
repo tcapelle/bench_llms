@@ -61,16 +61,17 @@ def speed_score(model_output):
 
 @dataclass
 class BenchmarkConfig:
-    provider: str = "fireworks"
-    prompt: str = "Tell me a long story about a cat"
-    n: int = 10
+    provider: str = "fireworks" # provider to evaluate
+    prompt: str = "Tell me a long story about a cat" # prompt to evaluate
+    n: int = 10 # number of prompts to evaluate
+    weave_project: str = "benchmark_llama_70b" # "prompt-eng/benchmark_llama_70b"
 
 
 if __name__ == "__main__":
     config = simple_parsing.parse(BenchmarkConfig)
     print(f"Running benchmark with config: {config}")
     provider = PROVIDERS[config.provider]
-    weave.init("prompt-eng/benchmark_llama_70b")
+    weave.init(args.weave_project)
 
     class Llama70b(weave.Model):
         @weave.op
