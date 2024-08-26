@@ -3,6 +3,7 @@ import openai
 import random
 import time
 import weave
+from weave.autopatch import reset_autopatch
 import asyncio
 from providers import PROVIDERS
 
@@ -10,9 +11,9 @@ import simple_parsing
 
 
 @weave.op
-def call_llama(client, model="llama3.1-70b", prompt=None):
+async def call_llama(client, model="llama3.1-70b", prompt=None):
     start_time = time.perf_counter()
-    response = client.chat.completions.create(
+    response = await client.chat.completions.create(
         model=model,
         max_tokens=2048,
         temperature=random.random(),
@@ -23,52 +24,33 @@ def call_llama(client, model="llama3.1-70b", prompt=None):
     end_time = time.perf_counter()
     real_time = end_time - start_time
     
-    time_info = getattr(response, 'time_info', None)
-    if time_info:
-        prompt_tok_sec = response.usage.prompt_tokens / time_info["prompt_time"]
-        completion_tok_sec = response.usage.completion_tokens / time_info["completion_time"]
-    else:
-        # If time_info is not available, use real_time for both prompt and completion
-        prompt_tok_sec = None
-        completion_tok_sec = response.usage.completion_tokens / real_time
+    completion_tok_sec = response.usage.completion_tokens / real_time
 
     return {
         "real_time": real_time, 
-        "prompt_tok_sec": prompt_tok_sec, 
         "completion_tok_sec": completion_tok_sec, 
-        "time_info": time_info or {"real_time": real_time},
+        "real_time": real_time,
+        "total_tokens": response.usage.total_tokens,
         "response": response
     }
-
-@weave.op
-def evaluate_model_perf(client, model, prompt, num_runs=10):
-    perf_results = {
-        "real_time": 0., 
-        "prompt_tok_sec": 0., 
-        "completion_tok_sec": 0., 
-    }
-    for i in range(num_runs):
-        output = call_llama(client, model=model, prompt=prompt)
-        perf_results["real_time"] += output["real_time"]
-        perf_results["prompt_tok_sec"] += output["prompt_tok_sec"]
-        perf_results["completion_tok_sec"] += output["completion_tok_sec"]
 
 def metrics(model_output):
     return {
         "real_time": model_output["real_time"],
-        "prompt_tok_sec": model_output["prompt_tok_sec"],
         "completion_tok_sec": model_output["completion_tok_sec"],
+        "total_tokens": model_output["total_tokens"],
     }
 
 
 def main(config):
     provider = PROVIDERS[config.provider]
     weave.init(config.weave_project)
+    reset_autopatch()
 
     class Llama70b(weave.Model):
         @weave.op
-        def predict(self, prompt):
-            return call_llama(provider.client, provider.model, prompt)
+        async def predict(self, prompt):
+            return await call_llama(provider.client, provider.model, prompt)
 
     llama = Llama70b()
     evaluation = weave.Evaluation(dataset=[{"prompt": config.prompt} for _ in range(config.n)], scorers=[metrics])
